@@ -4,14 +4,14 @@ type MyOmit<T, K extends keyof any> = {
 
 type MyOmit1<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
 
-interface User {
+interface User2 {
     id: string,
     name: string,
     age: number
 }
 
-type UserWithoutId = MyOmit<User, 'id'>;
-type UserWithoutId1 = MyOmit1<User, 'id'>;
+type UserWithoutId = MyOmit<User2, 'id'>;
+type UserWithoutId1 = MyOmit1<User2, 'id'>;
 
 const user: UserWithoutId ={
     name: 'Sudheer',

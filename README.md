@@ -135,6 +135,20 @@ const fn = (x: number) => x * 2;
 
 TypeScript is smart enough to infer a lot, but explicit types are still important in public APIs and complex logic.
 
+`typeof` means different things in JavaScript and TypeScript:
+
+- In JavaScript, `typeof value` is a runtime check that returns values like `'string'`, `'number'`, and `'object'`.
+- In TypeScript, `typeof` is also used in type positions to refer to the type of an existing value.
+
+```ts
+const status = 'active';
+
+const anotherStatus: typeof status = 'inactive';
+// same as: 'active' | 'inactive' if widened by union context
+```
+
+This helps when you want to reuse the exact type of a variable without repeating it manually.
+
 ### 7. Control-flow narrowing
 TypeScript narrows the type inside conditions based on runtime checks.
 
@@ -152,6 +166,26 @@ console.log(format(12.34)); // 12.34
 ```
 
 This is one of the most useful patterns in TypeScript because it keeps the code safe without repeated casts.
+
+`instanceof` is a runtime JavaScript operator, so it only works with values that are actual runtime objects created by a constructor or class. An `interface` does not exist at runtime, because TypeScript removes it during compilation.
+
+```ts
+interface Animal {
+  name: string;
+}
+
+class Dog {
+  constructor(public name: string) {}
+}
+
+const pet: Animal = new Dog('Max');
+
+// console.log(pet instanceof Animal); // error
+// Animal is not a value, so JavaScript cannot check it at runtime
+console.log(pet instanceof Dog); // true
+```
+
+This is why you use a type guard or a class check instead of `instanceof` with an interface.
 
 ### 8. User-defined type guards
 When data comes from outside the app, TypeScript sometimes needs help narrowing it.
@@ -493,9 +527,19 @@ const config = {
   port: number;
   mode: 'development' | 'production';
 };
+
+// config.port is still 3000, not number
+// config.mode is still 'production', not string
+
+const routes = {
+  home: '/home',
+  dashboard: '/dashboard',
+} satisfies Record<string, string>;
 ```
 
-`as const` keeps values literal; `satisfies` validates compatibility without widening the type.
+`as const` keeps values literal; `satisfies` validates compatibility without widening the type. It is especially useful when you want a value to match a specific shape while still preserving its exact literal values for autocomplete and inference.
+
+Example: without `satisfies`, TypeScript might widen `mode` from `'production'` to `string`. With `satisfies`, the object is checked against a target type, but its inferred type remains precise.
 
 ### 28. Exhaustive checks with `never`
 This is commonly used to ensure all variants of a union are handled.
